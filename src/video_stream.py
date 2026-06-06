@@ -40,14 +40,19 @@ class VideoStreamWidget(QFrame):
         self.vlc_player = None
         
         if VLC_AVAILABLE:
-            # Configurações do VLC (silencia logs no terminal e ativa otimizações de rede/buffer)
+            # Configurações do VLC para ultra-baixa latência em CFTV/RTSP
             args = [
                 '--quiet',
                 '--no-xlib',
-                '--network-caching=300',  # Reduz buffer para diminuir lag (300ms)
-                '--clock-synchro=0',      # Desativa sinc rígido de relógio para evitar lags acumulados
+                '--network-caching=100',      # Reduz buffer de rede para 100ms (padrão é 1000ms+)
+                '--live-caching=100',         # Reduz buffer de live streams para 100ms
+                '--clock-synchro=0',          # Desativa sincronia de relógio rígida
                 '--clock-jitter=0',
-                '--rtsp-tcp'              # Força RTSP via TCP para evitar perda de pacotes e artefatos
+                '--no-audio',                 # Desativa áudio (remove buffer de sincronização A/V)
+                '--no-video-title-show',      # Não exibe o título preto do stream sobre o vídeo
+                '--drop-late-frames',         # Descarta quadros atrasados na decodificação
+                '--skip-frames',              # Pula quadros se a CPU/GPU do PC atrasar
+                '--rtsp-tcp'                  # Força RTSP via TCP (evita perda de pacotes e artefatos)
             ]
             self.vlc_instance = vlc.Instance(args)
             self.vlc_player = self.vlc_instance.media_player_new()

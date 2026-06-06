@@ -78,6 +78,27 @@
           "stream_tipo": "sub"
         }
       ]
+    },
+    {
+      "id": "cond_teste",
+      "nome": "Teste",
+      "dvrs": [
+        {
+          "nome": "TESTE macintel",
+          "ip": "192.168.88.245",
+          "onvif_port": 80,
+          "user": "admin",
+          "password": "Cfh@.0433"
+        }
+      ],
+      "cameras": [
+        {
+          "nome": "camera 1",
+          "stream_tipo": "sub",
+          "dvr": "TESTE macintel",
+          "canal": 1
+        }
+      ]
     }
   ]
 }
