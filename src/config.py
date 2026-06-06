@@ -64,8 +64,15 @@ class ConfigManager:
         ip = dvr.get("ip")
         user = dvr.get("user", "admin")
         pwd = dvr.get("password", "")
+        port = dvr.get("onvif_port", 80)
         
-        # Exemplo de URL de fallback (Intelbras/Dahua usam esta estrutura padrão de RTSP)
+        # 1. Tenta resolver dinamicamente via ONVIF se a biblioteca estiver operacional
+        from src.onvif_service import get_rtsp_stream_via_onvif
+        onvif_rtsp = get_rtsp_stream_via_onvif(ip, port, user, pwd, canal, stream_tipo)
+        if onvif_rtsp:
+            return onvif_rtsp
+            
+        # 2. Se falhar ou estiver offline, usa o template padrão do fabricante (Intelbras/Dahua)
         # rtsp://usuario:senha@ip:554/cam/realmonitor?channel=X&subtype=Y
         # subtype=0 é Main Stream, subtype=1 é Sub-Stream (Extra)
         subtype = 1 if stream_tipo == "sub" else 0

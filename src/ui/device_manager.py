@@ -174,6 +174,9 @@ class DeviceManagerDialog(QDialog):
         dvr_layout.addWidget(self.dvr_table)
         
         dvr_btns = QHBoxLayout()
+        self.scan_dvr_btn = QPushButton("🔍 Localizar na Rede")
+        self.scan_dvr_btn.setToolTip("Procurar câmeras e DVRs compatíveis com ONVIF na rede local")
+        self.scan_dvr_btn.clicked.connect(self.scan_network)
         self.add_dvr_btn = QPushButton("+ Adicionar DVR")
         self.add_dvr_btn.clicked.connect(self.add_dvr)
         self.edit_dvr_btn = QPushButton("Editar")
@@ -181,6 +184,7 @@ class DeviceManagerDialog(QDialog):
         self.del_dvr_btn = QPushButton("Remover")
         self.del_dvr_btn.clicked.connect(self.delete_dvr)
         
+        dvr_btns.addWidget(self.scan_dvr_btn)
         dvr_btns.addWidget(self.add_dvr_btn)
         dvr_btns.addWidget(self.edit_dvr_btn)
         dvr_btns.addWidget(self.del_dvr_btn)
@@ -450,3 +454,73 @@ class DeviceManagerDialog(QDialog):
         if reply == QMessageBox.Yes:
             self.config.delete_camera(self.selected_condo_id, cam_name)
             self.refresh_camera_table()
+
+    def scan_network(self):
+        """Busca dispositivos ONVIF na rede local e exibe para importação."""
+        from src.onvif_service import discover_onvif_devices
+        
+        # Alerta visual rápido
+        QMessageBox.information(
+            self, "Varredura de Rede",
+            "Iniciando busca por dispositivos ONVIF na sua rede local.\n"
+            "Esta varredura pode levar cerca de 2 segundos. Clique em OK para começar.",
+            QMessageBox.Ok
+        )
+        
+        urls = discover_onvif_devices()
+        
+        if not urls:
+            QMessageBox.warning(
+                self, "Nenhum Dispositivo Encontrado",
+                "Nenhum dispositivo ONVIF (câmera IP ou DVR) respondeu à varredura multicast.\n"
+                "Verifique se os dispositivos estão ligados, na mesma sub-rede e com o ONVIF ativado.",
+                QMessageBox.Ok
+            )
+            return
+            
+        # Extrai IPs das URLs localizadas
+        import urllib.parse
+        ips = []
+        for url in urls:
+            parsed = urllib.parse.urlparse(url)
+            host = parsed.netloc if parsed.netloc else parsed.path.split('/')[0]
+            if host not in ips:
+                ips.append(host)
+                
+        # Mostra um diálogo para seleção
+        options_list = [f"IP: {ip} (Endereço: {url})" for ip, url in zip(ips, urls)]
+        
+        fields = [("dvr_select", "combo", (options_list, "Dispositivos Localizados:"))]
+        dialog = InputDialog("Dispositivos ONVIF Encontrados", fields, self)
+        
+        if dialog.exec() == QDialog.Accepted:
+            selected_str = dialog.get_data().get("dvr_select")
+            if selected_str:
+                # Extrai o host/IP
+                # Formato: "IP: 192.168.1.100:80 (Endereço: ...)"
+                try:
+                    ip_part = selected_str.split(" (")[0].replace("IP: ", "")
+                    host_ip = ip_part.split(":")[0]
+                    port_part = ip_part.split(":")[1] if ":" in ip_part else "80"
+                    
+                    # Abre o formulário de cadastro pré-preenchido com o IP
+                    dvr_dialog = InputDialog(
+                        "Adicionar DVR Localizado", 
+                        self.get_dvr_fields(), 
+                        self, 
+                        initial_values={"ip": host_ip, "onvif_port": port_part, "user": "admin"}
+                    )
+                    if dvr_dialog.exec() == QDialog.Accepted:
+                        data = dvr_dialog.get_data()
+                        if data["nome"] and data["ip"]:
+                            dvr_data = {
+                                "nome": data["nome"],
+                                "ip": data["ip"],
+                                "onvif_port": int(data["onvif_port"]) if data["onvif_port"].isdigit() else 80,
+                                "user": data["user"],
+                                "password": data["password"]
+                            }
+                            self.config.add_dvr(self.selected_condo_id, dvr_data)
+                            self.refresh_dvr_table()
+                except Exception as e:
+                    print(f"Erro ao importar dispositivo localizado: {e}")
