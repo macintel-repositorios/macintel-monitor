@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+build/
+dist/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local config (Pode conter credenciais de DVR reais, ideal manter ignorado ou apenas um cameras.json de exemplo)
+# config/cameras.json

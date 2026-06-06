@@ -1,0 +1,83 @@
+{
+  "condominios": [
+    {
+      "id": "cond_vista_alegre",
+      "nome": "Condomínio Vista Alegre",
+      "dvrs": [
+        {
+          "nome": "DVR Portaria Principal",
+          "ip": "192.168.1.100",
+          "onvif_port": 80,
+          "user": "admin",
+          "password": "senha_segura"
+        }
+      ],
+      "cameras": [
+        {
+          "nome": "Portão Social (Entrada)",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "dvr": "DVR Portaria Principal",
+          "canal": 1,
+          "stream_tipo": "sub"
+        },
+        {
+          "nome": "Garagem Subsolo",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "dvr": "DVR Portaria Principal",
+          "canal": 2,
+          "stream_tipo": "sub"
+        },
+        {
+          "nome": "Hall de Entrada",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          "dvr": "DVR Portaria Principal",
+          "canal": 3,
+          "stream_tipo": "sub"
+        },
+        {
+          "nome": "Piscina / Área Comum",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          "dvr": "DVR Portaria Principal",
+          "canal": 4,
+          "stream_tipo": "sub"
+        }
+      ]
+    },
+    {
+      "id": "cond_solar_flores",
+      "nome": "Condomínio Solar das Flores",
+      "dvrs": [
+        {
+          "nome": "DVR Bloco A",
+          "ip": "192.168.2.200",
+          "onvif_port": 8899,
+          "user": "admin",
+          "password": "admin"
+        }
+      ],
+      "cameras": [
+        {
+          "nome": "Entrada de Pedestres",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          "dvr": "DVR Bloco A",
+          "canal": 1,
+          "stream_tipo": "sub"
+        },
+        {
+          "nome": "Rampa da Garagem",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+          "dvr": "DVR Bloco A",
+          "canal": 2,
+          "stream_tipo": "sub"
+        },
+        {
+          "nome": "Parquinho Infantil",
+          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+          "dvr": "DVR Bloco A",
+          "canal": 3,
+          "stream_tipo": "sub"
+        }
+      ]
+    }
+  ]
+}
